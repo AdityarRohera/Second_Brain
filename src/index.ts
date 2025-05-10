@@ -10,9 +10,10 @@ app.use(express.json());
 import dbConnect from './database/dbConnect';
 dbConnect();
 
-app.get('/', (req:Request, res:Response) => {
-  res.send('Hello World!')
-})
+// All Routes here 
+import userRouter from './routes/userRoute';
+
+app.use('/api/v1/user' , userRouter)
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}`)
