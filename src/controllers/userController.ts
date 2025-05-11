@@ -1,4 +1,4 @@
-import { Request , Response } from "express";
+import { Request , Response , RequestHandler } from "express";
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt'
 const secret : string|undefined = process.env.JWT_SECRET;
@@ -6,6 +6,8 @@ const saltRounds = 10;
 
 // all files import
 import userModel from "../Models/userModel";
+import tagModel from "../Models/tagsModel";
+import contentModel from "../Models/contentModel";
 import { AuthenticatedRequest } from "../middlewares/userAuth";
 
 export const userSignup = async (req: Request, res: Response): Promise<void> => {
@@ -125,12 +127,53 @@ export const userSignin = async (req: Request, res: Response): Promise<void> => 
     }
 };
 
-export const userContent = async (req: AuthenticatedRequest , res: Response): Promise<void> => {
+export const createContent : RequestHandler = async (req: Request , res: Response): Promise<void> => {
     try{
+         const userReq = req as AuthenticatedRequest;
+        const {userId} = userReq
+        const {contentType , link , title , tags} = req.body;
+        
+        console.log(tags);
 
-        const {userId} = req;
-        const {contentType , link , title} = req.body;
 
+
+        // create user content
+        const createContent = await (await contentModel.create({contentType , link , title , tags , userId})).populate("tags" , "tag");
+
+        // console.log(createContent);
+
+        res.status(200).send({
+            message : "content created",
+            content : createContent
+        })
+
+    } catch(err : unknown){
+        let errorMessage;
+        if(err instanceof Error){
+            errorMessage = err.message;
+        } else if(typeof(err) === 'string'){
+            errorMessage = err;
+        }
+
+        res.status(500).send({
+            status : "fail",
+            message : errorMessage
+        })
+    }
+}
+
+export const contentTag : RequestHandler = async (req: Request , res: Response) : Promise<void> => {
+    try{
+        const {tag} = req.body;
+        let contentTag = await tagModel.findOne({tag})
+
+        if(!contentTag) contentTag = await tagModel.create({tag})
+        
+        res.status(200).send({
+            message : "tag added",
+            tag_id : contentTag._id
+        })
+        
     } catch(err : unknown){
         let errorMessage;
         if(err instanceof Error){

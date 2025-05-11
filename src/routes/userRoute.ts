@@ -5,6 +5,7 @@ const userRouter = Router();
 import { userSignup , userSignin } from '../controllers/userController';
 import { userAuth } from '../middlewares/userAuth';
 import { AuthenticatedRequest } from '../middlewares/userAuth';
+import { createContent , contentTag } from '../controllers/userController';
 
 // user authentication routes
 userRouter.post('/signup' , userSignup );
@@ -14,8 +15,9 @@ userRouter.post('/signin' , userSignin );
 userRouter.use(userAuth);
 
 // all user routes
-// userRouter.post('/create/content');
-// userRouter.get('/content');
+
+userRouter.post('/create-content' , createContent);
+userRouter.get('/content' , contentTag );
 
 
 export default userRouter;

@@ -35,5 +35,5 @@ const noteSchema : Schema<ContentType> = new Schema({
     userId : {type : ObjectId , ref: 'users', required : true}
 })
 
-const noteModel : Model<ContentType> = mongoose.model('Notes' , noteSchema);
-export default noteModel;
+const contentModel : Model<ContentType> = mongoose.model('Notes' , noteSchema);
+export default contentModel;
