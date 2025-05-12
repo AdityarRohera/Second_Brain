@@ -1,8 +1,10 @@
-import { Request , Response , RequestHandler } from "express";
+import { Request , Response , RequestHandler, urlencoded } from "express";
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt'
 const secret : string|undefined = process.env.JWT_SECRET;
 const saltRounds = 10;
+import mongoose , {Schema , Model , Types, ObjectId}  from "mongoose";
+const {ObjectId} = Schema.Types;
 
 // all files import
 import userModel from "../Models/userModel";
@@ -133,12 +135,10 @@ export const createContent : RequestHandler = async (req: Request , res: Respons
         const {userId} = userReq
         const {contentType , link , title , tags} = req.body;
         
-        console.log(tags);
-
-
+        // console.log(tags);
 
         // create user content
-        const createContent = await (await contentModel.create({contentType , link , title , tags , userId})).populate("tags" , "tag");
+        const createContent = await (await contentModel.create({contentType , link , title , tags , userId})).populate("tags" , "tag")
 
         // console.log(createContent);
 
@@ -176,6 +176,142 @@ export const contentTag : RequestHandler = async (req: Request , res: Response) 
         
     } catch(err : unknown){
         let errorMessage;
+        if(err instanceof Error){
+            errorMessage = err.message;
+        } else if(typeof(err) === 'string'){
+            errorMessage = err;
+        }
+
+        res.status(500).send({
+            status : "fail",
+            message : errorMessage
+        })
+    }
+}
+
+export const getContent : RequestHandler = async(req: Request , res: Response) : Promise<void> => {
+    try{
+        
+        const userReq = req as AuthenticatedRequest;
+        const getId = userReq.userId;
+        
+        // get your content
+        const getContent = await contentModel.find({userId : getId}).populate("tags" , "tag");
+        res.status(200).send({
+            status : "success",
+            message : "Data fatched",
+            content : getContent
+        })
+
+    } catch(err: unknown){
+         let errorMessage;
+         
+        if(err instanceof Error){
+            errorMessage = err.message;
+        } else if(typeof(err) === 'string'){
+            errorMessage = err;
+        }
+
+        res.status(500).send({
+            status : "fail",
+            message : errorMessage
+        })
+    }
+}
+
+export const deleteContent : RequestHandler = async(req: Request , res: Response) : Promise<void> => {
+    try{
+        
+        const userReq = req as AuthenticatedRequest;
+        const {userId} = userReq;
+        const {contentId} = req.body;
+
+        // delete content
+        await contentModel.findOneAndDelete({userId : userId , _id : contentId});
+        res.status(200).send({
+            status : "success",
+            message : "content deleted"
+        })
+
+    } catch(err: unknown){
+         let errorMessage;
+         
+        if(err instanceof Error){
+            errorMessage = err.message;
+        } else if(typeof(err) === 'string'){
+            errorMessage = err;
+        }
+
+        res.status(500).send({
+            status : "fail",
+            message : errorMessage
+        })
+    }
+}
+
+export const updateContent : RequestHandler = async(req: Request , res: Response) : Promise<void> => {
+    try{
+        
+        const userReq = req as AuthenticatedRequest;
+        const {userId} = userReq;
+        const {contentId , contentType , link , title , tags} = req.body;
+
+        // if(tags){
+        //     const findContent = await contentModel.findOneAndUpdate({userId : userId , _id : contentId} , {
+                
+        //     });
+        // }
+
+        // delete content
+        await contentModel.findOneAndUpdate({userId : userId , _id : contentId} , {contentType , link , title});
+
+        res.status(200).send({
+            status : "success",
+            message : "content deleted"
+        })
+
+    } catch(err: unknown){
+         let errorMessage;
+         
+        if(err instanceof Error){
+            errorMessage = err.message;
+        } else if(typeof(err) === 'string'){
+            errorMessage = err;
+        }
+
+        res.status(500).send({
+            status : "fail",
+            message : errorMessage
+        })
+    }
+}
+
+export const shareContent : RequestHandler = async(req: Request , res: Response) : Promise<void> => {
+    try{
+        
+        const userReq = req as AuthenticatedRequest;
+        const {userId} = userReq;
+
+        // find user for check share is true or false
+        const checkUser = await userModel.findOne({_id : userId})
+        console.log(checkUser)
+
+        if (checkUser){
+            // now create user sharable link for whole content
+                // urlencoded
+
+        }
+
+
+
+        res.status(200).send({
+            status : "success",
+            message : "content deleted"
+        })
+
+    } catch(err: unknown){
+         let errorMessage;
+         
         if(err instanceof Error){
             errorMessage = err.message;
         } else if(typeof(err) === 'string'){

@@ -7,6 +7,7 @@ interface ContentType {
     title: string;
     tags: Types.ObjectId[];
     userId: Types.ObjectId; 
+    created_at : Date
 }
 
 const contentTypes = ['image', 'video', 'article', 'audio']; // Extend as needed
@@ -32,8 +33,9 @@ const noteSchema : Schema<ContentType> = new Schema({
                  type : ObjectId, ref: 'tags', required: true
              }
     ],
-    userId : {type : ObjectId , ref: 'users', required : true}
+    userId : {type : ObjectId , ref: 'users', required : true},
+    created_at : {type: Date, required: true, default: Date.now}
 })
 
-const contentModel : Model<ContentType> = mongoose.model('Notes' , noteSchema);
+const contentModel : Model<ContentType> = mongoose.model('content' , noteSchema);
 export default contentModel;
