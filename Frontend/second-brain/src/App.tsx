@@ -1,35 +1,24 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+// import { useState } from 'react''
 import './App.css'
+// import Card from './components/Card'
+// import Button from './components/ui/Button'
+// import { LuShare2 } from "react-icons/lu";
+import SideBar from './components/SideBar';
 
 function App() {
-  const [count, setCount] = useState(0)
+  
+  return(
+    <div className='bg-gray-100'>
+      {/* <Button variant="secondary" size='lg' text='Share Brain' startIcon={<LuShare2 />} onClick={() => {console.log("button clicked 2")}} />
+      <Button variant="primary" size='lg' text='Add Content' onClick={() => {console.log("button clicked")}} /> */}
+      
+        {/* <Card title='Project Ideas' link='https://www.youtube.com/embed/vv4y_uOneC0?si=wzbToqSzT2K_SGhs' tags='#Productivity' type='twitter' date='10/10/2024'/> */}
+        {/* <Card title='Project Ideas' link="https://twitter.com/Ankiii_i/status/1921590665646895185?ref_src=twsrc%5Etfw" tags='#Productivity' type='twitter' date='10/10/2024'/> */}
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+        <SideBar/>
+      
+    </div>
   )
 }
 
-export default App
+export default App;
