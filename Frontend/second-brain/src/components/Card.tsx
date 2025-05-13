@@ -12,7 +12,7 @@ interface CardType {
 
 function Card({title , link , type , tags , date} : CardType) {
   return (
-    <div className="flex flex-col gap-8 border w-[360px] min-h-[400px] p-4 rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 bg-white hover:scale-[1.01] hover:border-blue-300">
+    <div className="flex flex-col gap-8 border border-gray-300 w-[360px] h-[400] p-4 rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 bg-white hover:scale-[1.01] hover:border-blue-300">
 
   {/* Top Navigation */}
   <div className="flex justify-between items-center text-lg font-semibold">
