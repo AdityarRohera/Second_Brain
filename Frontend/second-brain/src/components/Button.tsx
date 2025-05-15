@@ -2,17 +2,18 @@ import type { ReactElement } from "react";
 
 
 interface ButtonProps {
-    variant : "primary" | "secondary";
+    variant : "primary" | "secondary" | "redish";
     size : "sm" | "md" | "lg";
     text : string;
     startIcon? : ReactElement;
     endIcon? : ReactElement;
-    onClick : () => void;
+    onClick : (e: any) => void;
 }
 
 const buttonVariant = {
     primary : "bg-purple-600 text-white",
-    secondary : "bg-purple-200 text-purple-600"
+    secondary : "bg-purple-200 text-purple-600",
+    redish : "bg-red-600 text-white"
 }
 const sizeVariant = {
     sm : "w-[50px] , h-[50px]",

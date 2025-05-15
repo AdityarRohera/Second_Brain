@@ -1,16 +1,21 @@
 // import { useState } from 'react''
 import './App.css'
-import Container from './components/Container';
+import DashBoard from './pages/DashBoard';
+import SignUp from './pages/SignUp';
+import SignIn from './pages/SignIn';
+
+  import {Route, Routes } from 'react-router-dom';
 
 function App() {
   
   return(
-    <div className='bg-gray-100'>
-      
-        {/* <Card title='Project Ideas' link='https://www.youtube.com/embed/vv4y_uOneC0?si=wzbToqSzT2K_SGhs' tags='#Productivity' type='twitter' date='10/10/2024'/> */}
-        {/* <Card title='Project Ideas' link="https://twitter.com/Ankiii_i/status/1921590665646895185?ref_src=twsrc%5Etfw" tags='#Productivity' type='twitter' date='10/10/2024'/> */}
+    <div className='bg-gray-100 w-[100vw] min-h-[100vh] flex justify-center items-center'>
 
-        <Container/>
+        <Routes>
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/dashboard" element={<DashBoard />} />
+        </Routes>
       
     </div>
   )

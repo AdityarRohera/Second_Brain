@@ -1,1 +1,7 @@
 
+.active{
+    display: block;
+}
+.light-backgrond{
+    opacity: 0.5;
+}
