@@ -10,7 +10,8 @@ interface ContentType {
     created_at : Date
 }
 
-const contentTypes = ['image', 'video', 'article', 'audio']; // Extend as needed
+// const contentTypes = ['image', 'video', 'article', 'audio' , 'post']; // Extend as needed
+    const contentTypes = ['image' , 'youtube' , 'twitter'];
 
 const noteSchema : Schema<ContentType> = new Schema({
     contentType : {

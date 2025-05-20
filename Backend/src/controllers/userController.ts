@@ -135,10 +135,15 @@ export const createContent : RequestHandler = async (req: Request , res: Respons
         const {userId} = userReq
         const {contentType , link , title , tags} = req.body;
         
-        // console.log(tags);
+        console.log(contentType ,tags , link , title);
+
+        const tagIds: any = [];
+        tags.map((tag:any) => {
+            tagIds.push(tag.value);
+        })
 
         // create user content
-        const createContent = await (await contentModel.create({contentType , link , title , tags , userId})).populate("tags" , "tag")
+        const createContent = await (await contentModel.create({contentType , link , title , tags:tagIds , userId})).populate("tags" , "tag")
 
         // console.log(createContent);
 
@@ -162,32 +167,58 @@ export const createContent : RequestHandler = async (req: Request , res: Respons
     }
 }
 
-export const contentTag : RequestHandler = async (req: Request , res: Response) : Promise<void> => {
-    try{
-        const {tag} = req.body;
-        let contentTag = await tagModel.findOne({tag})
+    export const contentTag : RequestHandler = async (req: Request , res: Response) : Promise<void> => {
+        try{
+            console.log("inside tag")
+            const {tag} = req.body;
+            let contentTag = await tagModel.findOne({_id: tag});
 
-        if(!contentTag) contentTag = await tagModel.create({tag})
-        
-        res.status(200).send({
-            message : "tag added",
-            tag_id : contentTag._id
-        })
-        
-    } catch(err : unknown){
-        let errorMessage;
-        if(err instanceof Error){
-            errorMessage = err.message;
-        } else if(typeof(err) === 'string'){
-            errorMessage = err;
+            if(!contentTag) contentTag = await tagModel.create({tag})
+            
+            res.status(200).send({
+                message : "tag added",
+                tag: contentTag.tag
+            })
+            
+        } catch(err : unknown){
+            let errorMessage;
+            if(err instanceof Error){
+                errorMessage = err.message;
+            } else if(typeof(err) === 'string'){
+                errorMessage = err;
+            }
+
+            res.status(500).send({
+                status : "fail",
+                message : errorMessage
+            })
         }
-
-        res.status(500).send({
-            status : "fail",
-            message : errorMessage
-        })
     }
-}
+
+    export const getTag : RequestHandler = async (req: Request , res: Response) : Promise<void> => {
+        try{
+             console.log("inside getTag");
+             const getTag = await tagModel.find({});
+            
+            res.status(200).send({
+                message : "tag fatched",
+                tags : getTag
+            })
+            
+        } catch(err : unknown){
+            let errorMessage;
+            if(err instanceof Error){
+                errorMessage = err.message;
+            } else if(typeof(err) === 'string'){
+                errorMessage = err;
+            }
+
+            res.status(500).send({
+                status : "fail",
+                message : errorMessage
+            })
+        }
+    }
 
 export const getContent : RequestHandler = async(req: Request , res: Response) : Promise<void> => {
     try{
