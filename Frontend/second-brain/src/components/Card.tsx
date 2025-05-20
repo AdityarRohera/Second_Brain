@@ -5,12 +5,19 @@ import { RiDeleteBinLine } from "react-icons/ri";
 interface CardType {
   title : string,
   link : string,
-  tags : string,
+  tags? : object[],
   type : "twitter" | "youtube"
-  date : string
+  date? : string
 }
 
 function Card({title , link , type , tags , date} : CardType) {
+  console.log(tags)
+  if(!date){
+    return;
+  }
+  const formatedDate = date.slice(0,10);
+
+
   return (
     <div className="flex flex-col gap-8 border border-gray-300 w-[360px] h-[400] p-4 rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 bg-white hover:scale-[1.01] hover:border-blue-300">
 
@@ -62,13 +69,28 @@ function Card({title , link , type , tags , date} : CardType) {
 
 
   {/* Tags */}
-  <span className="text-sm text-blue-700 bg-gray-200 rounded-full px-3 py-1 w-fit">
-    {tags}
-  </span>
+  <div className="flex justify-start items-center gap-4">
+
+     {
+        tags ? (
+            tags.map((t : any) => {
+              const {tag} = t;
+               return (
+                  <span key={t._id} className="text-sm text-blue-700 bg-gray-200 rounded-full px-3 py-1 w-fit">
+                  {tag}
+               </span>
+               )
+            })
+        ) : null
+     }
+
+  </div>
 
   {/* Date */}
   <div className="text-gray-400 text-sm font-medium">
-    {`Added on ${date}`}
+    {
+      `Added on ${formatedDate}`
+    }
   </div>
 
 </div>

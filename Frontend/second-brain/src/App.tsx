@@ -15,6 +15,7 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/dashboard" element={<DashBoard />} />
+            <Route path='*' element={"Page Not Found"}/>
         </Routes>
       
     </div>

@@ -1,14 +1,16 @@
 import type { RefObject } from "react";
 import { IoClose } from "react-icons/io5";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // import React from 'react';
 import Select from 'react-select';
 import InputBox from "./InputBox";
 import Button from "./Button";
+import axios from "axios";
 
 interface AddContentType {
   addRef: RefObject<HTMLDivElement | null>; // ✅ allows null
   onClose : () => void;
+  getCards : () => void;
 }
 
 type OptionType = {
@@ -17,28 +19,87 @@ type OptionType = {
 };
 
 //  select tags 
-    const options:  OptionType[]  = [
-      {value: "productivity" , label: "Productivity"},
-      {value: "ideas" , label: "Ideas"},
-      {value: "learning" , label: "Learning"}
-    ]
+  let options:  OptionType[]  = [];
+
+// select content-type
+const contentOptions = [
+  { value: 'image', label: 'Image' },
+  { value: 'youtube', label: 'youtube' },
+  { value: 'twitter', label: 'twitter' },
+  // { value: 'audio', label: 'Audio' },
+];
+
 
 // AddContent Component;
-function AddContent({ addRef , onClose }: AddContentType) {
+function AddContent({ addRef , onClose, getCards }: AddContentType) {
+  console.log("inside addcontent")
 
   const [inputValue, setInputValue] = useState({
     title: "",
     url: "",
-    tags: [] as string[],
+    tags: [] as OptionType[],
   });
-
   const [selectedTag, setSelectedTag] = useState<OptionType | null>(null);
+   const [selectedType, setSelectedType] = useState<OptionType | null>(null);
 
-  console.log(inputValue);
+   // functions starts here
+    const addTagHandler = async(e: any) => {
+      e.preventDefault();
+      try{
 
-    const addTagHandler = () => {
-      console.log("Tag Added")
+        if(selectedTag == null){return};
+
+        const res = await axios.post("http://localhost:3000/api/v1/user/create-tag" , {
+          tag : selectedTag.value
+        } , {headers: {'Content-Type': 'application/json'}, withCredentials:true});
+
+        if(res){
+          console.log(res.data);
+          if(selectedTag != null){
+            setInputValue((prev) => ({
+              ...prev,
+              tags: [...prev.tags, selectedTag],
+             }));
+            setSelectedTag(null); // ✅ Reset selected tag after adding
+          }
+        }
+
+      }catch(err:any){
+        if (err.response) {
+             console.log("Backend error:", err.response.data);
+             alert(err.response.data.message);
+             } else {
+             console.log("Network or setup error:", err.message);
+             }
+      }
     }
+
+    const getAllTags = async() => {
+      try{
+        const res = await axios.get("http://localhost:3000/api/v1/user/get-tags");
+        if(res){
+          console.log(res.data);
+          const {tags} = res.data;
+          tags.map((t :  { [key: string]: string }) => {
+            options.push({value: `${t._id}` , label: `${t.tag}`})
+          })
+        }
+
+      }catch(err:any){
+         if (err.response) {
+             console.log("Backend error:", err.response.data);
+             alert(err.response.data.message);
+             } else {
+             console.log("Network or setup error:", err.message);
+             }
+      }
+    }
+
+    useEffect(() => {
+      getAllTags();
+      console.log("getallTags called")
+    } , [])
+
 
     const inputChangeHandler = (e:any) => {
        const {name , value} = e.target;
@@ -47,24 +108,55 @@ function AddContent({ addRef , onClose }: AddContentType) {
        })
     }
 
+    const contentTypeHandler = (selectedOption: any) => {
+          setSelectedType(selectedOption);
+    };
+
    const handleTagChange = (selected: OptionType | null) => {
            if (!selected) return;
       
         console.log(selected.label); // ✅ correct way
       
         setSelectedTag(selected);
-      
-        setInputValue((prev) => ({
-          ...prev,
-          tags: [...prev.tags, selected.label], // if you want only labels in state
-        }));
   };
 
-
-    const submitHandler = (e: any) => {
+    const submitHandler = async (e: any) => {
       e.preventDefault();
-      console.log("submitted");
-      onClose();
+      // api call for post data
+      console.log("submitted" , inputValue);
+
+      const token = localStorage.getItem('token');
+
+      try{
+            const res = await axios.post("http://localhost:3000/api/v1/user/create-content" , {
+                title : inputValue.title,
+                link : inputValue.url,
+                tags : inputValue.tags,
+                contentType : selectedType ? selectedType.value : null
+            } , {headers: {'Content-Type': 'application/json' , token: `${token}`}, withCredentials:true})
+            if(res){
+              console.log(res);
+            }
+            onClose();
+            getCards();
+
+             setInputValue({
+                title: "",
+                url: "",
+                tags: []
+              });
+             setSelectedType(null); // If you're using a Select dropdown
+             setSelectedTag(null);
+
+      } catch(err : any){
+         if (err.response) {
+             console.log("Backend error:", err.response.data);
+             alert(err.response.data.message);
+             } else {
+             console.log("Network or setup error:", err.message);
+             }
+      }
+      
     }
 
   //   const removeTag = (valueToRemove: string) => {
@@ -78,7 +170,7 @@ function AddContent({ addRef , onClose }: AddContentType) {
   return (
     <div
       ref={addRef}
-      className="border-2 border-gray-400 bg-white h-[500px] w-[500px] fixed top-[30%] left-[45%] hidden p-4 rounded-2xl"
+      className="border-2 border-gray-400 bg-white h-[580px] w-[500px] fixed top-[20%] left-[45%] hidden p-4 rounded-2xl"
     >
 
         {/* header  */}
@@ -97,6 +189,14 @@ function AddContent({ addRef , onClose }: AddContentType) {
         <InputBox type="text" Placeholder="Enter the Title" name="title" id="title" value={inputValue.title || ""} onChange={inputChangeHandler}/>
       </div>
 
+
+      {/* content-type  */}
+      <div className="flex justify-between text-2xl">
+        <label htmlFor="title">Content-Type :</label>
+        <Select className="w-[60%] text-2xl" options={contentOptions} value={selectedType} onChange={contentTypeHandler} placeholder={"Select content..."}></Select>
+      </div>
+
+
       {/* upload url  */}
       <div className="flex justify-between text-2xl">
         <label className="min-w-[150px]" htmlFor="title">Upload Link :</label>
@@ -109,14 +209,14 @@ function AddContent({ addRef , onClose }: AddContentType) {
         {/* selectTag  */}
         <div className="flex justify-between items-center gap-3 h-[40px]">
         <Select className="w-[60%] text-2xl" options={options} name="select-tag" value={selectedTag ? selectedTag : undefined } onChange={(e) => {handleTagChange(e)}} />
-          <Button variant={"primary"} size={"lg"} text="Add Tag" onClick={addTagHandler}/>
+          <Button variant={"primary"} size={"lg"} text="Add Tag" onClick={(e) => {addTagHandler(e)}}/>
         </div>
 
           {/* contain all tags */}
           <div className="border-2 border-gray-200 w-[100%] min-h-[150px] p-2 rounded-2xl flex justify-center items-center text-blue-600 gap-3">
 
             {inputValue.tags.map((tag, index) => (
-                <span key={index}>{`#${tag}` + " "}</span>
+                <span key={index}>{`#${tag.label}` + " "}</span>
             ))}
             
           </div>

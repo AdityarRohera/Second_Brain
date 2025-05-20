@@ -1,14 +1,40 @@
 import { useState } from "react"
 import InputBox from "../components/InputBox"
 import Button from "../components/Button";
+import axios from "axios";
 
 function SignIn() {
 
     const [userAuth , setUserAuth] = useState({username:"" , password:""});
     console.log(userAuth);
 
-    const submitHandler = () => {
-        console.log(userAuth);
+    
+    const submitHandler = async(e:any) => {
+        e.preventDefault();
+        console.log("inside submit");
+
+        // call post api
+        try{
+            const res = await axios.post("http://localhost:3000/api/v1/user/signin" , {
+                // data to post
+                userName : userAuth.username,
+                password : userAuth.password
+            } , {headers: {'Content-Type': 'application/json'}, withCredentials:true}
+        );
+
+            if(res){
+                console.log("data only -> " , res.data);
+                localStorage.setItem("token" , res.data.token);
+            }
+            
+        } catch(err: any){
+             if (err.response) {
+            console.log("Backend error:", err.response.data);
+            alert(err.response.data.message);
+            } else {
+            console.log("Network or setup error:", err.message);
+            }
+        }
     }
 
     const changeHandler = (e:any) : void => {
